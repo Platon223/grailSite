@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Grail — Gmail for the Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #120d14;
+    --bg2:       #1a1220;
+    --bg3:       #221829;
+    --surface:   #2a1e33;
+    --border:    rgba(180,60,60,0.18);
+    --border2:   rgba(180,60,60,0.35);
+    --red:       #c0392b;
+    --red-light: #e05545;
+    --red-dim:   #8b2020;
+    --red-glow:  rgba(192,57,43,0.15);
+    --text:      #ede8f0;
+    --text2:     #a89ab8;
+    --text3:     #6e5f80;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+  [data-theme="light"] {
+    --bg:        #faf7fb;
+    --bg2:       #f0eaf4;
+    --bg3:       #e8dff0;
+    --surface:   #fff;
+    --border:    rgba(140,30,30,0.14);
+    --border2:   rgba(140,30,30,0.3);
+    --red:       #c0392b;
+    --red-light: #a02020;
+    --red-dim:   #d45050;
+    --red-glow:  rgba(192,57,43,0.08);
+    --text:      #1a0f22;
+    --text2:     #5c4470;
+    --text3:     #9580aa;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  /* ---- NOISE TEXTURE ---- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    height: 64px;
+    background: rgba(18,13,20,0.85);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.3s;
+  }
+  [data-theme="light"] nav {
+    background: rgba(250,247,251,0.85);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .nav-logo svg {
+    width: 28px;
+    height: 28px;
+  }
+  .nav-logo-text {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--red-light); }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text2);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--red);
+    color: var(--red-light);
+    background: var(--red-glow);
+  }
+  .btn-nav {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .btn-nav:hover { background: var(--red-light); }
+
+  /* ---- HERO ---- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    overflow: hidden;
+  }
+  .hero-bg-hex {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    height: 700px;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+  [data-theme="light"] .hero-bg-hex { opacity: 0.06; }
+  .hero-badge {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    border: 1px solid var(--border2);
+    border-radius: 999px;
+    padding: 5px 16px;
+    margin-bottom: 2rem;
+    display: inline-block;
+    background: var(--red-glow);
+  }
+  .hero h1 {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+  .hero h1 span {
+    color: var(--red-light);
+    position: relative;
+  }
+  .hero-sub {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    color: var(--text2);
+    max-width: 540px;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 4rem;
+  }
+  .btn-primary {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--red-light); transform: translateY(-1px); }
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 14px 28px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+  }
+  .btn-secondary:hover {
+    border-color: var(--red);
+    color: var(--red-light);
+    transform: translateY(-1px);
+  }
+
+  /* ---- TERMINAL PREVIEW ---- */
+  .terminal-wrap {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border2);
+    box-shadow: 0 0 60px rgba(192,57,43,0.12), 0 40px 80px rgba(0,0,0,0.4);
+  }
+  .terminal-bar {
+    background: var(--bg3);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .terminal-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .terminal-dot.red { background: #c0392b; }
+  .terminal-dot.yellow { background: #e67e22; }
+  .terminal-dot.green { background: #27ae60; }
+  .terminal-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text3);
+    margin-left: auto;
+    margin-right: auto;
+    letter-spacing: 0.05em;
+  }
+  .terminal-body {
+    background: #0d0a10;
+    padding: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: #c9bedd;
+    text-align: left;
+    min-height: 260px;
+  }
+  [data-theme="light"] .terminal-body {
+    background: #1a0f22;
+  }
+  .t-prompt { color: #8b2020; }
+  .t-cmd { color: #e05545; }
+  .t-output { color: #a89ab8; }
+  .t-hl { color: #e8d5b0; }
+  .t-dim { color: #5e4f70; }
+  .t-green { color: #4caf50; }
+  .t-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background: var(--red-light);
+    vertical-align: text-bottom;
+    animation: blink 1.1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ---- SECTIONS ---- */
+  section {
+    position: relative;
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+  .section-sub {
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    color: var(--text2);
+    max-width: 500px;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+  }
+
+  /* ---- DIVIDER ---- */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0 auto;
+  }
+
+  /* ---- FEATURES ---- */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .feature-card {
+    background: var(--bg);
+    padding: 2rem;
+    transition: background 0.2s;
+  }
+  .feature-card:hover { background: var(--bg2); }
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--red-glow);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    color: var(--red-light);
+    font-size: 18px;
+  }
+  .feature-title {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .feature-desc {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text2);
+    line-height: 1.75;
+  }
+
+  /* ---- INSTALL ---- */
+  .install-section {
+    text-align: center;
+  }
+  .install-block {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .install-block:hover { border-color: var(--red); }
+  .install-cmd {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+  .install-cmd span { color: var(--red-light); }
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text3);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover {
+    border-color: var(--red);
+    color: var(--red-light);
+  }
+  .install-note {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- HOW IT WORKS ---- */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    counter-reset: steps;
+  }
+  .step {
+    counter-increment: steps;
+    position: relative;
+    padding-left: 0;
+  }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    color: var(--red-dim);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+  .step-num::before {
+    content: "0" counter(steps);
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--border2);
+    margin-bottom: 0.25rem;
+    font-family: var(--sans);
+    letter-spacing: -0.02em;
+  }
+  .step-title {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+  }
+  .step-desc {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text2);
+    line-height: 1.75;
+  }
+
+  /* ---- STATS ---- */
+  .stats-bar {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 3rem;
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
+    flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: var(--red-light);
+    letter-spacing: -0.02em;
+    display: block;
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ---- CTA ---- */
+  .cta-section {
+    text-align: center;
+    padding: 7rem 2rem;
+  }
+  .cta-hex {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+  }
+  .cta-section h2 {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--text);
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  .cta-section p {
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    color: var(--text2);
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+  .footer-links {
+    display: flex;
+    gap: 1.75rem;
+    list-style: none;
+  }
+  .footer-links a {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text3);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--red-light); }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.7s ease both; }
+  .fade-up-1 { animation-delay: 0.1s; }
+  .fade-up-2 { animation-delay: 0.2s; }
+  .fade-up-3 { animation-delay: 0.35s; }
+  .fade-up-4 { animation-delay: 0.5s; }
+  .fade-up-5 { animation-delay: 0.65s; }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 700px) {
+    nav { padding: 0 1.25rem; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+    .stats-bar { gap: 2.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" stroke="#c0392b" stroke-width="6" fill="none"/>
+      <polygon points="50,16 81,33.5 81,66.5 50,84 19,66.5 19,33.5" stroke="#8b2020" stroke-width="3" fill="none"/>
+      <text x="50" y="67" text-anchor="middle" font-family="'Syne',sans-serif" font-weight="800" font-size="46" fill="url(#glogo)">G</text>
+      <defs>
+        <linearGradient id="glogo" x1="30" y1="25" x2="70" y2="75" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#e05545"/>
+          <stop offset="100%" stop-color="#8b2020"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="nav-logo-text">Grail</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="docs.html">Docs</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <a href="https://github.com/Platon223/Grail" class="btn-nav" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <!-- giant background hex -->
+  <svg class="hero-bg-hex" viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="350,20 660,192.5 660,507.5 350,680 40,507.5 40,192.5" stroke="#c0392b" stroke-width="2"/>
+    <polygon points="350,60 620,215 620,485 350,640 80,485 80,215" stroke="#c0392b" stroke-width="1"/>
+  </svg>
+
+  <div class="hero-badge fade-up fade-up-1">v0.1.0 — open source</div>
+
+  <h1 class="fade-up fade-up-2">
+    Gmail,<br/>
+    <span>in your terminal.</span>
+  </h1>
+
+  <p class="hero-sub fade-up fade-up-3">
+    Grail is a blazing-fast TUI for reading, composing, and managing Gmail — built in Go, powered by Bubble Tea. No browser required.
+  </p>
+
+  <div class="hero-actions fade-up fade-up-4">
+    <a href="#install" class="btn-primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+      Install now
+    </a>
+    <a href="https://github.com/Platon223/Grail" class="btn-secondary" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+      View source
+    </a>
+  </div>
+
+  <!-- Terminal preview -->
+  <div class="terminal-wrap fade-up fade-up-5">
+    <div class="terminal-bar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <span class="terminal-title">grail — inbox</span>
+    </div>
+    <div class="terminal-body" aria-label="Terminal preview of Grail TUI">
+<div><span class="t-prompt">❯ </span><span class="t-cmd">grail inbox</span></div>
+<div class="t-dim">────────────────────────────────────────────────────────</div>
+<div><span class="t-hl">  INBOX</span><span class="t-dim">                                    3 unread / 142 total</span></div>
+<div class="t-dim">────────────────────────────────────────────────────────</div>
+<div><span class="t-green">● </span><span class="t-hl">GitHub Notifications   </span><span class="t-output">  [PR] feat: add label filter support  </span><span class="t-dim">2m</span></div>
+<div><span class="t-green">● </span><span class="t-hl">Stripe                 </span><span class="t-output">  Your monthly invoice is ready         </span><span class="t-dim">1h</span></div>
+<div><span class="t-green">● </span><span class="t-hl">Arch Linux Mailing     </span><span class="t-output">  [ANNOUNCE] pacman 6.1.0 released      </span><span class="t-dim">3h</span></div>
+<div><span class="t-dim">  noreply@vercel.com   </span><span class="t-output">  Deployment successful — grail-web     </span><span class="t-dim">1d</span></div>
+<div><span class="t-dim">  team@linear.app      </span><span class="t-output">  Weekly digest: 4 issues completed     </span><span class="t-dim">2d</span></div>
+<div class="t-dim">────────────────────────────────────────────────────────</div>
+<div><span class="t-dim">  [j/k] navigate  [o] open  [r] reply  [d] delete  [q] quit</span></div>
+<div>&nbsp;</div>
+<div><span class="t-prompt">❯ </span><span class="t-cursor"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-num">100%</span>
+    <span class="stat-label">Terminal-native</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">Go</span>
+    <span class="stat-label">Written in</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">MIT</span>
+    <span class="stat-label">License</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">0</span>
+    <span class="stat-label">Browser required</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything your inbox needs,<br/>nothing it doesn't.</h2>
+  <p class="section-sub">Built for developers who live in the terminal. Grail keeps you in flow.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div class="feature-title">Full TUI — keyboard-first</div>
+      <div class="feature-desc">Navigate your inbox with vim-style keybindings. No mouse. No context switching.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="feature-title">Read &amp; compose</div>
+      <div class="feature-desc">Render HTML emails as markdown, write replies in your $EDITOR of choice.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div class="feature-title">Search &amp; filter</div>
+      <div class="feature-desc">Full Gmail query syntax. Search by label, sender, date, attachment — all from the prompt.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="feature-title">OAuth2 — secure by default</div>
+      <div class="feature-desc">Grail uses Google's official OAuth2 flow. Your credentials never touch our servers.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <div class="feature-title">Built with Bubble Tea</div>
+      <div class="feature-desc">Powered by the Charm ecosystem — Bubble Tea, Glamour, Lipgloss. Fast and composable.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </div>
+      <div class="feature-title">Label management</div>
+      <div class="feature-desc">Apply, remove, and create Gmail labels without touching a browser. Scriptable too.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Up in three steps.</h2>
+  <p class="section-sub">From zero to inbox in under two minutes.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">Install</div>
+      <div class="step-title">Get the binary</div>
+      <div class="step-desc">Install via <code style="color:var(--red-light);font-family:var(--mono)">go install</code> or grab a prebuilt release from GitHub.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Authenticate</div>
+      <div class="step-title">Link your account</div>
+      <div class="step-desc">Run <code style="color:var(--red-light);font-family:var(--mono)">grail auth</code>. Grail opens a browser once for the OAuth handshake, then stores the token locally.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Launch</div>
+      <div class="step-title">Open your inbox</div>
+      <div class="step-desc">Run <code style="color:var(--red-light);font-family:var(--mono)">grail inbox</code>. That's it. You're in.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Configure</div>
+      <div class="step-title">Make it yours</div>
+      <div class="step-desc">Edit <code style="color:var(--red-light);font-family:var(--mono)">~/.config/grail/config.toml</code> to set keybinds, themes, and per-label rules.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INSTALL -->
+<section id="install" class="install-section">
+  <div class="section-label">Install</div>
+  <h2 class="section-title">Get started now.</h2>
+  <p class="section-sub" style="margin: 0 auto 2.5rem;">Requires Go 1.21+. Works on Linux, macOS, and WSL.</p>
+
+  <div class="install-block" onclick="copyInstall(this, 'go install github.com/Platon223/Grail@latest')">
+    <div class="install-cmd"><span>$</span> go install github.com/Platon223/Grail@latest</div>
+    <button class="copy-btn" aria-label="Copy install command">copy</button>
+  </div>
+  <br/>
+  <div class="install-block" onclick="copyInstall(this, 'grail auth && grail inbox')">
+    <div class="install-cmd"><span>$</span> grail auth &amp;&amp; grail inbox</div>
+    <button class="copy-btn" aria-label="Copy run command">copy</button>
+  </div>
+
+  <p class="install-note" style="margin-top: 1.5rem;">
+    Or download a prebuilt binary from the
+    <a href="https://github.com/Platon223/Grail/releases" style="color:var(--red-light);text-decoration:none;" target="_blank" rel="noopener">releases page ↗</a>
+  </p>
+</section>
+
+<!-- CTA -->
+<div class="divider"></div>
+<section class="cta-section">
+  <svg class="cta-hex" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" stroke="#c0392b" stroke-width="5" fill="rgba(192,57,43,0.08)"/>
+    <text x="50" y="67" text-anchor="middle" font-family="'Syne',sans-serif" font-weight="800" font-size="46" fill="url(#gcta)">G</text>
+    <defs>
+      <linearGradient id="gcta" x1="30" y1="25" x2="70" y2="75" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#e05545"/>
+        <stop offset="100%" stop-color="#8b2020"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <h2>Your inbox deserves better.</h2>
+  <p>Join the developers who never leave their terminal.</p>
+  <a href="https://github.com/Platon223/Grail" class="btn-primary" target="_blank" rel="noopener" style="margin: 0 auto; display: inline-flex;">
+    Star on GitHub
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" stroke="#c0392b" stroke-width="7" fill="none"/>
+      <text x="50" y="67" text-anchor="middle" font-family="'Syne',sans-serif" font-weight="800" font-size="52" fill="#c0392b">G</text>
+    </svg>
+    <span class="footer-copy">© 2026 Grail. MIT License.</span>
+  </div>
+  <ul class="footer-links">
+    <li><a href="docs.html">Docs</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="https://github.com/Platon223/Grail" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+
+  const moonSVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  const sunSVG = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('grail-theme', theme);
+    icon.innerHTML = theme === 'dark' ? sunSVG : moonSVG;
+  }
+
+  const saved = localStorage.getItem('grail-theme') || 'dark';
+  setTheme(saved);
+
+  toggle.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  function copyInstall(el, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.querySelector('.copy-btn');
+      const orig = btn.textContent;
+      btn.textContent = 'copied!';
+      btn.style.color = 'var(--red-light)';
+      btn.style.borderColor = 'var(--red)';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 1800);
+    });
+  }
+</script>
+</body>
+</html>
