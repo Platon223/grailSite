@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contact — Grail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #120d14;
+    --bg2:       #1a1220;
+    --bg3:       #221829;
+    --surface:   #2a1e33;
+    --border:    rgba(180,60,60,0.18);
+    --border2:   rgba(180,60,60,0.35);
+    --red:       #c0392b;
+    --red-light: #e05545;
+    --red-dim:   #8b2020;
+    --red-glow:  rgba(192,57,43,0.15);
+    --text:      #ede8f0;
+    --text2:     #a89ab8;
+    --text3:     #6e5f80;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Syne', sans-serif;
+    --nav-h:     64px;
+  }
+  [data-theme="light"] {
+    --bg:        #faf7fb;
+    --bg2:       #f0eaf4;
+    --bg3:       #e8dff0;
+    --surface:   #fff;
+    --border:    rgba(140,30,30,0.14);
+    --border2:   rgba(140,30,30,0.3);
+    --red:       #c0392b;
+    --red-light: #a02020;
+    --red-dim:   #d45050;
+    --red-glow:  rgba(192,57,43,0.08);
+    --text:      #1a0f22;
+    --text2:     #5c4470;
+    --text3:     #9580aa;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ---- NAV ---- */
+  nav.topnav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    height: var(--nav-h);
+    background: rgba(18,13,20,0.88);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.3s;
+  }
+  [data-theme="light"] nav.topnav { background: rgba(250,247,251,0.88); }
+
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-text { font-family: var(--sans); font-weight: 800; font-size: 1.2rem; color: var(--text); letter-spacing: 0.04em; }
+  .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--text2);
+    text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--red-light); }
+  .nav-links a.active { color: var(--red-light); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .theme-toggle {
+    background: none; border: 1px solid var(--border2); border-radius: 6px;
+    width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; color: var(--text2); transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .theme-toggle:hover { border-color: var(--red); color: var(--red-light); background: var(--red-glow); }
+  .btn-nav {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--red); color: #fff; border: none; border-radius: 6px; padding: 8px 18px;
+    cursor: pointer; text-decoration: none; transition: background 0.2s;
+  }
+  .btn-nav:hover { background: var(--red-light); }
+
+  /* ---- PAGE ---- */
+  .page {
+    min-height: 100vh;
+    padding-top: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .contact-wrap {
+    width: 100%;
+    max-width: 960px;
+    padding: 5rem 2rem 6rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  /* ---- LEFT ---- */
+  .contact-left {
+    position: sticky;
+    top: calc(var(--nav-h) + 3rem);
+  }
+
+  .contact-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 0.75rem;
+  }
+
+  .contact-title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 1.25rem;
+  }
+
+  .contact-desc {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.9;
+    margin-bottom: 2.5rem;
+  }
+
+  /* contact cards */
+  .contact-cards { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .contact-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  }
+  .contact-card:hover {
+    border-color: var(--border2);
+    background: var(--bg3);
+    transform: translateX(4px);
+  }
+
+  .contact-card-icon {
+    width: 38px; height: 38px; flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--red-glow);
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red-light);
+  }
+
+  .contact-card-body { flex: 1; min-width: 0; }
+  .contact-card-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 2px;
+  }
+  .contact-card-value {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+
+  .contact-card-arrow {
+    color: var(--text3);
+    font-size: 0.9rem;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .contact-card:hover .contact-card-arrow {
+    color: var(--red-light);
+    transform: translateX(3px);
+  }
+
+  /* ---- RIGHT (compose card) ---- */
+  .compose-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  /* fake terminal bar on top */
+  .compose-bar {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .compose-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .compose-dot.r { background: #c0392b; }
+  .compose-dot.y { background: #e67e22; }
+  .compose-dot.g { background: #27ae60; }
+  .compose-bar-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text3);
+    margin: 0 auto;
+    letter-spacing: 0.06em;
+  }
+
+  .compose-body { padding: 2rem; }
+
+  .compose-field { margin-bottom: 1.25rem; }
+  .compose-field-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+
+  /* static display fields — not real inputs, just visual */
+  .field-display {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text2);
+    letter-spacing: 0.02em;
+  }
+  .field-display.to { color: var(--red-light); }
+
+  /* editable fields */
+  .field-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+    -webkit-appearance: none;
+  }
+  .field-input::placeholder { color: var(--text3); }
+  .field-input:focus { border-color: var(--red); }
+
+  .field-textarea {
+    height: 130px;
+    line-height: 1.7;
+  }
+
+  .compose-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0.5rem 0 1.5rem;
+  }
+
+  .compose-hint {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text3);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  .compose-hint span { color: var(--red-light); }
+
+  .btn-send {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 24px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-send:hover { background: var(--red-light); transform: translateY(-1px); }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 760px) {
+    .contact-wrap { grid-template-columns: 1fr; gap: 3rem; padding: 3rem 1.25rem 4rem; }
+    .contact-left { position: static; }
+    nav.topnav { padding: 0 1.25rem; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a class="nav-logo" href="index.html">
+    <svg width="26" height="26" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" stroke="#c0392b" stroke-width="7" fill="none"/>
+      <text x="50" y="67" text-anchor="middle" font-family="'Syne',sans-serif" font-weight="800" font-size="48" fill="#c0392b">G</text>
+    </svg>
+    <span class="nav-logo-text">Grail</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs">Docs</a></li>
+    <li><a href="/contact" class="active">Contact</a></li>
+    <li><a href="/privacy">Privacy</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <a href="https://github.com/Platon223/Grail" class="btn-nav" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="contact-wrap">
+
+    <!-- LEFT -->
+    <div class="contact-left">
+      <div class="contact-eyebrow">Contact</div>
+      <h1 class="contact-title">Get in touch.</h1>
+      <p class="contact-desc">
+        Found a bug? Have a feature idea? Just want to say something? Send a message — it opens straight in your mail client.
+      </p>
+
+      <div class="contact-cards">
+        <a class="contact-card" href="mailto:contact@grail.sh?subject=Grail%20Feedback">
+          <div class="contact-card-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Email</div>
+            <div class="contact-card-value">contact@grail.sh</div>
+          </div>
+          <span class="contact-card-arrow">→</span>
+        </a>
+
+        <a class="contact-card" href="https://github.com/Platon223/Grail/issues/new" target="_blank" rel="noopener">
+          <div class="contact-card-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+          </div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Bug reports &amp; feature requests</div>
+            <div class="contact-card-value">Open a GitHub issue</div>
+          </div>
+          <span class="contact-card-arrow">→</span>
+        </a>
+
+        <a class="contact-card" href="https://github.com/Platon223/Grail/discussions" target="_blank" rel="noopener">
+          <div class="contact-card-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Community</div>
+            <div class="contact-card-value">GitHub Discussions</div>
+          </div>
+          <span class="contact-card-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- RIGHT — compose card -->
+    <div class="compose-card">
+      <div class="compose-bar">
+        <div class="compose-dot r"></div>
+        <div class="compose-dot y"></div>
+        <div class="compose-dot g"></div>
+        <span class="compose-bar-title">new message</span>
+      </div>
+
+      <div class="compose-body">
+        <div class="compose-field">
+          <span class="compose-field-label">To</span>
+          <div class="field-display to">platon.tikhnenko@gmail.com</div>
+        </div>
+
+        <div class="compose-field">
+          <label class="compose-field-label" for="subject">Subject</label>
+          <input
+            class="field-input"
+            id="subject"
+            type="text"
+            placeholder="e.g. Bug report — inbox not loading"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="compose-field">
+          <label class="compose-field-label" for="body">Message</label>
+          <textarea
+            class="field-input field-textarea"
+            id="body"
+            placeholder="What's on your mind?"
+          ></textarea>
+        </div>
+
+        <div class="compose-divider"></div>
+
+        <p class="compose-hint">
+          Clicking <span>Send message</span> will open your default mail client with the fields pre-filled. No data is sent through this website.
+        </p>
+
+        <a class="btn-send" id="sendBtn" href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send message
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Theme
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  const moonSVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  const sunSVG = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+  function setTheme(t) {
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('grail-theme', t);
+    icon.innerHTML = t === 'dark' ? sunSVG : moonSVG;
+  }
+  setTheme(localStorage.getItem('grail-theme') || 'dark');
+  toggle.addEventListener('click', () => setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+  // Build mailto link from subject + body fields
+  const sendBtn = document.getElementById('sendBtn');
+  const subjectInput = document.getElementById('subject');
+  const bodyInput = document.getElementById('body');
+
+  function updateMailto() {
+    const subject = encodeURIComponent(subjectInput.value || 'Grail Feedback');
+    const body = encodeURIComponent(bodyInput.value || '');
+    sendBtn.href = `mailto:platon.tikhnenko@gmail.com?subject=${subject}&body=${body}`;
+  }
+
+  subjectInput.addEventListener('input', updateMailto);
+  bodyInput.addEventListener('input', updateMailto);
+  updateMailto(); // set default on load
+</script>
+</body>
+</html>

@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Docs — Grail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #120d14;
+    --bg2:       #1a1220;
+    --bg3:       #221829;
+    --surface:   #2a1e33;
+    --border:    rgba(180,60,60,0.18);
+    --border2:   rgba(180,60,60,0.35);
+    --red:       #c0392b;
+    --red-light: #e05545;
+    --red-dim:   #8b2020;
+    --red-glow:  rgba(192,57,43,0.15);
+    --text:      #ede8f0;
+    --text2:     #a89ab8;
+    --text3:     #6e5f80;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Syne', sans-serif;
+    --sidebar-w: 260px;
+    --nav-h:     64px;
+  }
+  [data-theme="light"] {
+    --bg:        #faf7fb;
+    --bg2:       #f0eaf4;
+    --bg3:       #e8dff0;
+    --surface:   #fff;
+    --border:    rgba(140,30,30,0.14);
+    --border2:   rgba(140,30,30,0.3);
+    --red:       #c0392b;
+    --red-light: #a02020;
+    --red-dim:   #d45050;
+    --red-glow:  rgba(192,57,43,0.08);
+    --text:      #1a0f22;
+    --text2:     #5c4470;
+    --text3:     #9580aa;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: var(--nav-h);
+    background: rgba(18,13,20,0.88);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.3s;
+  }
+  [data-theme="light"] nav { background: rgba(250,247,251,0.88); }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .nav-logo-text {
+    font-family: var(--sans); font-weight: 800;
+    font-size: 1.2rem; color: var(--text); letter-spacing: 0.04em;
+  }
+  .nav-links {
+    display: flex; align-items: center; gap: 2rem; list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono); font-size: 0.72rem;
+    color: var(--text2); text-decoration: none;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--red-light); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+
+  .theme-toggle {
+    background: none; border: 1px solid var(--border2);
+    border-radius: 6px; width: 36px; height: 36px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text2); transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .theme-toggle:hover {
+    border-color: var(--red); color: var(--red-light); background: var(--red-glow);
+  }
+  .btn-nav {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em;
+    text-transform: uppercase; background: var(--red); color: #fff;
+    border: none; border-radius: 6px; padding: 8px 18px; cursor: pointer;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .btn-nav:hover { background: var(--red-light); }
+
+  /* ---- LAYOUT ---- */
+  .docs-layout {
+    display: flex;
+    padding-top: var(--nav-h);
+    min-height: 100vh;
+  }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    width: var(--sidebar-w);
+    height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+    padding: 2rem 0 4rem;
+    transition: background 0.3s;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+    z-index: 10;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .sidebar-section {
+    margin-bottom: 2rem;
+    padding: 0 1.25rem;
+  }
+  .sidebar-section-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.6rem;
+    padding: 0 0.5rem;
+  }
+  .sidebar-links { list-style: none; }
+  .sidebar-links li a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-decoration: none;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, color 0.15s;
+  }
+  .sidebar-links li a:hover {
+    background: var(--red-glow);
+    color: var(--text);
+  }
+  .sidebar-links li a.active {
+    background: var(--red-glow);
+    color: var(--red-light);
+    border-left: 2px solid var(--red);
+    padding-left: calc(0.5rem - 2px);
+  }
+  .sidebar-links li a .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--text3);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .sidebar-links li a:hover .dot,
+  .sidebar-links li a.active .dot { background: var(--red-light); }
+
+  /* ---- MAIN CONTENT ---- */
+  .docs-main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-width: 0;
+    padding: 3.5rem 4rem 6rem;
+  }
+
+  /* ---- TOC (right) — fixed, outside flex flow ---- */
+  .toc {
+    display: none;
+    position: fixed;
+    top: calc(var(--nav-h) + 3rem);
+    right: 2rem;
+    width: 180px;
+    z-index: 5;
+  }
+  @media (min-width: 1280px) {
+    .toc { display: block; }
+    .docs-main { padding-right: 220px; }
+  }
+  .toc-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+  }
+  .toc-links { list-style: none; }
+  .toc-links li { margin-bottom: 0.35rem; }
+  .toc-links a {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text3);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color 0.15s;
+    display: block;
+    padding: 2px 0;
+    border-left: 2px solid transparent;
+    padding-left: 8px;
+  }
+  .toc-links a:hover { color: var(--red-light); }
+  .toc-links a.active {
+    color: var(--red-light);
+    border-left-color: var(--red);
+  }
+
+  /* ---- DOC CONTENT ---- */
+  .doc-section {
+    margin-bottom: 5rem;
+    scroll-margin-top: calc(var(--nav-h) + 1.5rem);
+  }
+
+  .doc-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 0.5rem;
+  }
+
+  h1.doc-title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 2.4rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.1;
+  }
+  .doc-lead {
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    color: var(--text2);
+    line-height: 1.85;
+    margin-bottom: 2.5rem;
+    border-left: 2px solid var(--border2);
+    padding-left: 1.25rem;
+  }
+
+  h2.doc-h2 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 1.45rem;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    margin-top: 0;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2.doc-h2::before {
+    content: '#';
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: var(--red-dim);
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+
+  h3.doc-h3 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+  }
+
+  .doc-p {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.9;
+    margin-bottom: 1.25rem;
+  }
+
+  .doc-ul {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.9;
+    margin: 0 0 1.25rem 0;
+    padding: 0;
+    list-style: none;
+  }
+  .doc-ul li {
+    padding: 0.1rem 0 0.1rem 1.25rem;
+    position: relative;
+  }
+  .doc-ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--red-dim);
+    font-size: 0.7rem;
+    top: 0.25rem;
+  }
+
+  /* ---- CODE BLOCKS ---- */
+  .code-block {
+    background: #0d0a10;
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  [data-theme="light"] .code-block { background: #1a0f22; }
+  .code-block-bar {
+    background: var(--bg3);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .code-block-lang {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red-light);
+  }
+  .code-copy-btn {
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text3);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .code-copy-btn:hover { color: var(--red-light); border-color: var(--red); }
+  .code-block pre {
+    padding: 1.25rem 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.85;
+    color: #c9bedd;
+    overflow-x: auto;
+    tab-size: 2;
+  }
+  .code-block pre .t-prompt { color: #8b2020; }
+  .code-block pre .t-cmd { color: #e05545; }
+  .code-block pre .t-comment { color: #5e4f70; }
+  .code-block pre .t-key { color: #e8d5b0; }
+  .code-block pre .t-val { color: #9bcf9b; }
+  .code-block pre .t-str { color: #b5d4f4; }
+  .code-block pre .t-flag { color: #a89ab8; }
+
+  /* ---- INLINE CODE ---- */
+  code.inline {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    background: var(--red-glow);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--red-light);
+  }
+
+  /* ---- KEYBIND TABLE ---- */
+  .keybind-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+  }
+  .keybind-table thead tr {
+    border-bottom: 1px solid var(--border2);
+  }
+  .keybind-table th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 1rem 0.75rem 0;
+    font-weight: 400;
+  }
+  .keybind-table td {
+    padding: 0.55rem 1rem 0.55rem 0;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .keybind-table tr:last-child td { border-bottom: none; }
+  .keybind-table tr:hover td { color: var(--text); }
+  kbd {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: var(--text);
+    display: inline-block;
+    margin: 0 2px;
+  }
+  .key-action { color: var(--text2); }
+
+  /* ---- CALLOUT ---- */
+  .callout {
+    border-left: 3px solid var(--red);
+    background: var(--red-glow);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 0.35rem;
+  }
+  .callout p {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text2);
+    line-height: 1.75;
+    margin: 0;
+  }
+  .callout.info {
+    border-left-color: #378add;
+    background: rgba(55,138,221,0.08);
+  }
+  .callout.info .callout-label { color: #5ba4e8; }
+  .callout.warn {
+    border-left-color: #ba7517;
+    background: rgba(186,117,23,0.08);
+  }
+  .callout.warn .callout-label { color: #d08a20; }
+
+  /* ---- CONFIG TABLE ---- */
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.78rem;
+  }
+  .config-table thead tr { border-bottom: 1px solid var(--border2); }
+  .config-table th {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 1.25rem 0.75rem 0;
+    text-align: left;
+    font-weight: 400;
+  }
+  .config-table td {
+    font-family: var(--mono);
+    padding: 0.6rem 1.25rem 0.6rem 0;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .config-table tr:last-child td { border-bottom: none; }
+  .config-table td:first-child { color: var(--red-light); }
+  .config-table .default { color: var(--text3); font-style: italic; }
+
+  /* ---- SECTION DIVIDER ---- */
+  .section-div {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 4rem 0;
+  }
+
+  /* ---- PREV/NEXT ---- */
+  .doc-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .doc-nav-link {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: color 0.2s;
+    max-width: 220px;
+  }
+  .doc-nav-link:hover { color: var(--red-light); }
+  .doc-nav-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .doc-nav-link.next { text-align: right; margin-left: auto; }
+
+  /* ---- BADGE ---- */
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge-required {
+    background: rgba(192,57,43,0.15);
+    border: 1px solid var(--border2);
+    color: var(--red-light);
+  }
+  .badge-optional {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text3);
+  }
+
+  /* ---- MOBILE ---- */
+  .sidebar-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    width: 36px; height: 36px;
+    cursor: pointer;
+    align-items: center; justify-content: center;
+    color: var(--text2);
+  }
+  @media (max-width: 860px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+    .sidebar.open { transform: translateX(0); box-shadow: 8px 0 40px rgba(0,0,0,0.5); }
+    .docs-main { margin-left: 0; padding: 2rem 1.5rem 5rem; }
+    .sidebar-toggle { display: flex; }
+    nav { padding: 0 1.25rem; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <svg width="26" height="26" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" stroke="#c0392b" stroke-width="7" fill="none"/>
+      <text x="50" y="67" text-anchor="middle" font-family="'Syne',sans-serif" font-weight="800" font-size="48" fill="#c0392b">G</text>
+    </svg>
+    <span class="nav-logo-text">Grail</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs" class="active">Docs</a></li>
+    <li><a href="/contact">Contact</a></li>
+    <li><a href="/privacy">Privacy</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <a href="https://github.com/Platon223/Grail" class="btn-nav" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="docs-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Getting started</div>
+      <ul class="sidebar-links">
+        <li><a href="#introduction" class="active"><span class="dot"></span>Introduction</a></li>
+        <li><a href="#installation"><span class="dot"></span>Installation</a></li>
+        <li><a href="#authentication"><span class="dot"></span>Authentication</a></li>
+        <li><a href="#quick-start"><span class="dot"></span>Quick start</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Using Grail</div>
+      <ul class="sidebar-links">
+        <li><a href="#inbox"><span class="dot"></span>Inbox</a></li>
+        <li><a href="#reading"><span class="dot"></span>Reading email</a></li>
+        <li><a href="#composing"><span class="dot"></span>Composing &amp; replying</a></li>
+        <li><a href="#search"><span class="dot"></span>Search</a></li>
+        <li><a href="#labels"><span class="dot"></span>Labels</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Configuration</div>
+      <ul class="sidebar-links">
+        <li><a href="#config-file"><span class="dot"></span>Config file</a></li>
+        <li><a href="#keybinds"><span class="dot"></span>Keybindings</a></li>
+        <li><a href="#theming"><span class="dot"></span>Theming</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Reference</div>
+      <ul class="sidebar-links">
+        <li><a href="#cli-reference"><span class="dot"></span>CLI reference</a></li>
+        <li><a href="#oauth-setup"><span class="dot"></span>OAuth setup guide</a></li>
+        <li><a href="#faq"><span class="dot"></span>FAQ</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="docs-main">
+
+    <!-- Introduction -->
+    <section class="doc-section" id="introduction">
+      <div class="doc-eyebrow">Documentation</div>
+      <h1 class="doc-title">Grail Docs</h1>
+      <p class="doc-lead">
+        Grail is a terminal UI for Gmail, written in Go using Bubble Tea. It lets you read, compose, search, and manage email without leaving your terminal — keyboard-first, no browser required.
+      </p>
+      <p class="doc-p">This documentation covers everything from installation and OAuth setup to keybindings and configuration. If something is missing or wrong, open an issue on GitHub.</p>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Installation -->
+    <section class="doc-section" id="installation">
+      <h2 class="doc-h2">Installation</h2>
+      <p class="doc-p">Grail requires <strong style="color:var(--text)">Go 1.21 or later</strong>. It runs on Linux, macOS, and WSL2.</p>
+
+      <h3 class="doc-h3">Via go install</h3>
+      <p class="doc-p">The fastest way to get started:</p>
+      <div class="code-block">
+        <div class="code-block-bar">
+          <span class="code-block-lang">shell</span>
+          <button class="code-copy-btn" onclick="copyCode(this, 'go install github.com/Platon223/Grail@latest')">copy</button>
+        </div>
+        <pre><span class="t-prompt">$</span> <span class="t-cmd">go install</span> github.com/Platon223/Grail@latest</pre>
+      </div>
+      <p class="doc-p">Make sure <code class="inline">$GOPATH/bin</code> (typically <code class="inline">~/go/bin</code>) is in your <code class="inline">$PATH</code>.</p>
+
+      <h3 class="doc-h3">Prebuilt binaries</h3>
+      <p class="doc-p">Download a binary for your platform from the <a href="https://github.com/Platon223/Grail/releases" style="color:var(--red-light);text-decoration:none;" target="_blank" rel="noopener">GitHub releases page ↗</a>. Extract and place the binary somewhere in your <code class="inline">$PATH</code>.</p>
+
+      <h3 class="doc-h3">Build from source</h3>
+      <div class="code-block">
+        <div class="code-block-bar">
+          <span class="code-block-lang">shell</span>
+          <button class="code-copy-btn" onclick="copyCode(this, 'git clone https://github.com/Platon223/Grail.git\ncd Grail\ngo build -o grail .\nsudo mv grail /usr/local/bin/')">copy</button>
+        </div>
+        <pre><span class="t-prompt">$</span> <span class="t-cmd">git clone</span> https://github.com/Platon223/Grail.git
+<span class="t-prompt">$</span> <span class="t-cmd">cd</span> Grail
+<span class="t-prompt">$</span> <span class="t-cmd">go build</span> -o grail .
+<span class="t-prompt">$</span> <span class="t-cmd">sudo mv</span> grail /usr/local/bin/</pre>
+      </div>
+
+      <p class="doc-p">Verify the install:</p>
+      <div class="code-block">
+        <div class="code-block-bar">
+          <span class="code-block-lang">shell</span>
+          <button class="code-copy-btn" onclick="copyCode(this, 'grail --version')">copy</button>
+        </div>
+        <pre><span class="t-prompt">$</span> <span class="t-cmd">grail</span> --version
+<span class="t-flag">grail v0.1.0 (go1.22, linux/amd64)</span></pre>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Authentication -->
+    <section class="doc-section" id="authentication">
+      <h2 class="doc-h2">Authentication</h2>
+      <p class="doc-p">Grail uses Google's official OAuth2 flow with your own Google Cloud Desktop app credentials. Your tokens are stored locally and never sent anywhere outside of Google's APIs.</p>
+
+      <div class="callout warn">
+        <div class="callout-label">Before you begin</div>
+        <p>You need to create a Google Cloud project and download an OAuth2 credentials file. See the <a href="#oauth-setup" style="color:var(--red-light);text-decoration:none;">OAuth setup guide</a> below if you haven't done this yet.</p>
+      </div>
+
+      <p class="doc-p">Once you have your <code class="inline">credentials.json</code> file, place it at:</p>
+      <div class="code-block">
+        <div class="code-block-bar"><span class="code-block-lang">path</span></div>
+        <pre>~/.config/grail/credentials.json</pre>
+      </div>
+
+      <p class="doc-p">Then run the auth command:</p>
+      <div class="code-block">
+        <div class="code-block-bar">
+          <span class="code-block-lang">shell</span>
+          <button class="code-copy-btn" onclick="copyCode(this, 'grail auth')">copy</button>
+        </div>
+        <pre><span class="t-prompt">$</span> <span class="t-cmd">grail auth</span>
+<span class="t-flag">Opening browser for OAuth consent...</span>
+<span class="t-flag">If the browser did not open, visit:</span>
+<span class="t-str">  https://accounts.google.com/o/oauth2/auth?...</span>
+<span class="t-flag">Waiting for authorization...</span>
+<span class="t-val">✓ Authenticated as you@gmail.com</span>
+<span class="t-val">✓ Token saved to ~/.config/grail/token.json</span></pre>
+      </div>
+
+      <p class="doc-p">The token is saved to <code class="inline">~/.config/grail/token.json</code> and is automatically refreshed. You only need to run <code class="inline">grail auth</code> once per account.</p>
+
+      <div class="callout info">
+        <div class="callout-label">Note</div>
+        <p>To revoke access at any time, visit <a href="https://myaccount.google.com/permissions" style="color:#5ba4e8;text-decoration:none;" target="_blank" rel="noopener">myaccount.google.com/permissions ↗</a> or delete <code class="inline">~/.config/grail/token.json</code>.</p>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Quick Start -->
+    <section class="doc-section" id="quick-start">
+      <h2 class="doc-h2">Quick start</h2>
+      <p class="doc-p">Once authenticated, you're ready to go:</p>
+      <div class="code-block">
+        <div class="code-block-bar">
+          <span class="code-block-lang">shell</span>
+          <button class="code-copy-btn" onclick="copyCode(this, 'grail inbox')">copy</button>
+        </div>
+        <pre><span class="t-prompt">$</span> <span class="t-cmd">grail inbox</span>          <span class="t-comment"># open inbox</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grail inbox</span> --label SENT  <span class="t-comment"># open sent mail</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grail compose</span>         <span class="t-comment"># new email</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grail search</span> "from:boss@company.com"</pre>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Inbox -->
+    <section class="doc-section" id="inbox">
+      <h2 class="doc-h2">Inbox</h2>
+      <p class="doc-p">The inbox is Grail's main view. It lists your emails with sender, subject, and timestamp. Unread messages are highlighted.</p>
+
+      <h3 class="doc-h3">Inbox keybindings</h3>
+      <table class="keybind-table">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>j</kbd> / <kbd>↓</kbd></td><td class="key-action">Move down</td></tr>
+          <tr><td><kbd>k</kbd> / <kbd>↑</kbd></td><td class="key-action">Move up</td></tr>
+          <tr><td><kbd>g</kbd></td><td class="key-action">Jump to top</td></tr>
+          <tr><td><kbd>G</kbd></td><td class="key-action">Jump to bottom</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>o</kbd></td><td class="key-action">Open selected email</td></tr>
+          <tr><td><kbd>c</kbd></td><td class="key-action">Compose new email</td></tr>
+          <tr><td><kbd>/</kbd></td><td class="key-action">Search</td></tr>
+          <tr><td><kbd>d</kbd></td><td class="key-action">Delete (trash)</td></tr>
+          <tr><td><kbd>e</kbd></td><td class="key-action">Archive</td></tr>
+          <tr><td><kbd>m</kbd></td><td class="key-action">Mark as read/unread</td></tr>
+          <tr><td><kbd>l</kbd></td><td class="key-action">Apply label</td></tr>
+          <tr><td><kbd>r</kbd></td><td class="key-action">Refresh inbox</td></tr>
+          <tr><td><kbd>q</kbd></td><td class="key-action">Quit</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h3">Loading a specific label</h3>
+      <div class="code-block">
+        <div class="code-block-bar"><span class="code-block-lang">shell</span></div>
+        <pre><span class="t-prompt">$</span> <span class="t-cmd">grail inbox</span> --label STARRED
+<span class="t-prompt">$</span> <span class="t-cmd">grail inbox</span> --label SENT
+<span class="t-prompt">$</span> <span class="t-cmd">grail inbox</span> --label "My Custom Label"</pre>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Reading -->
+    <section class="doc-section" id="reading">
+      <h2 class="doc-h2">Reading email</h2>
+      <p class="doc-p">Opening an email renders its content using <a href="https://github.com/charmbracelet/glamour" style="color:var(--red-light);text-decoration:none;" target="_blank" rel="noopener">Glamour</a> — HTML is converted to Markdown and displayed with terminal-friendly styling.</p>
+
+      <h3 class="doc-h3">Email view keybindings</h3>
+      <table class="keybind-table">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>j</kbd> / <kbd>↓</kbd></td><td class="key-action">Scroll down</td></tr>
+          <tr><td><kbd>k</kbd> / <kbd>↑</kbd></td><td class="key-action">Scroll up</td></tr>
+          <tr><td><kbd>Space</kbd></td><td class="key-action">Page down</td></tr>
+          <tr><td><kbd>b</kbd></td><td class="key-action">Page up</td></tr>
+          <tr><td><kbd>r</kbd></td><td class="key-action">Reply</td></tr>
+          <tr><td><kbd>R</kbd></td><td class="key-action">Reply all</td></tr>
+          <tr><td><kbd>f</kbd></td><td class="key-action">Forward</td></tr>
+          <tr><td><kbd>d</kbd></td><td class="key-action">Delete</td></tr>
+          <tr><td><kbd>e</kbd></td><td class="key-action">Archive</td></tr>
+          <tr><td><kbd>y</kbd></td><td class="key-action">Copy email body to clipboard</td></tr>
+          <tr><td><kbd>Esc</kbd> / <kbd>q</kbd></td><td class="key-action">Back to inbox</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Composing -->
+    <section class="doc-section" id="composing">
+      <h2 class="doc-h2">Composing &amp; replying</h2>
+      <p class="doc-p">The compose view presents a simple form for <code class="inline">To</code>, <code class="inline">Subject</code>, and the message body. Tab between fields; when the body is focused, the full textarea is available.</p>
+
+      <h3 class="doc-h3">Compose keybindings</h3>
+      <table class="keybind-table">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Tab</kbd></td><td class="key-action">Next field</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td class="key-action">Previous field</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td class="key-action">Send email</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td class="key-action">Cancel / discard</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <div class="callout-label">Tip</div>
+        <p>Set <code class="inline">editor</code> in your config to open the body in your preferred <code class="inline">$EDITOR</code> instead of the inline textarea. This lets you write with full editor support, including plugins and spell check.</p>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Search -->
+    <section class="doc-section" id="search">
+      <h2 class="doc-h2">Search</h2>
+      <p class="doc-p">Press <kbd>/</kbd> from the inbox to open the search prompt. Grail passes your query directly to the Gmail API, so the full <a href="https://support.google.com/mail/answer/7190" style="color:var(--red-light);text-decoration:none;" target="_blank" rel="noopener">Gmail search syntax ↗</a> is supported.</p>
+
+      <h3 class="doc-h3">Common queries</h3>
+      <div class="code-block">
+        <div class="code-block-bar"><span class="code-block-lang">gmail query syntax</span></div>
+        <pre><span class="t-key">from:</span><span class="t-str">boss@company.com</span>          <span class="t-comment"># from a specific sender</span>
+<span class="t-key">to:</span><span class="t-str">me</span> <span class="t-key">subject:</span><span class="t-str">invoice</span>            <span class="t-comment"># subject contains "invoice"</span>
+<span class="t-key">is:</span><span class="t-str">unread</span> <span class="t-key">after:</span><span class="t-str">2024/01/01</span>      <span class="t-comment"># unread since Jan 2024</span>
+<span class="t-key">has:</span><span class="t-str">attachment</span> <span class="t-key">filename:</span><span class="t-str">pdf</span>    <span class="t-comment"># emails with PDF attachments</span>
+<span class="t-key">label:</span><span class="t-str">work</span> <span class="t-key">is:</span><span class="t-str">starred</span>             <span class="t-comment"># starred in label "work"</span>
+<span class="t-key">larger:</span><span class="t-str">5M</span>                          <span class="t-comment"># over 5MB in size</span></pre>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Labels -->
+    <section class="doc-section" id="labels">
+      <h2 class="doc-h2">Labels</h2>
+      <p class="doc-p">Press <kbd>l</kbd> on any email to open the label picker. You can apply or remove labels, and create new ones inline.</p>
+      <p class="doc-p">To list all your Gmail labels:</p>
+      <div class="code-block">
+        <div class="code-block-bar"><span class="code-block-lang">shell</span></div>
+        <pre><span class="t-prompt">$</span> <span class="t-cmd">grail labels</span> list</pre>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Config file -->
+    <section class="doc-section" id="config-file">
+      <h2 class="doc-h2">Config file</h2>
+      <p class="doc-p">Grail reads its configuration from <code class="inline">~/.config/grail/config.toml</code>. The file is created automatically on first run with defaults. Edit it to customize behavior.</p>
+
+      <div class="code-block">
+        <div class="code-block-bar">
+          <span class="code-block-lang">toml</span>
+          <button class="code-copy-btn" onclick="copyCode(this, '[general]\neditor = \\'nvim\\'\nbrowser = \\'xdg-open\\'\npage_size = 25\n\n[keybinds]\nopen = \\'o\\'\nreply = \\'r\\'\ndelete = \\'d\\'\narchive = \\'e\\'\nsearch = \\'/\\'\n\n[theme]\nstyle = \\'dark\\'')">copy</button>
+        </div>
+        <pre><span class="t-comment"># ~/.config/grail/config.toml</span>
+
+[<span class="t-key">general</span>]
+<span class="t-key">editor</span>    = <span class="t-str">"nvim"</span>       <span class="t-comment"># editor for compose body</span>
+<span class="t-key">browser</span>   = <span class="t-str">"xdg-open"</span>  <span class="t-comment"># browser for OAuth / links</span>
+<span class="t-key">page_size</span> = <span class="t-val">25</span>          <span class="t-comment"># emails per page in inbox</span>
+
+[<span class="t-key">keybinds</span>]
+<span class="t-key">open</span>    = <span class="t-str">"o"</span>
+<span class="t-key">reply</span>   = <span class="t-str">"r"</span>
+<span class="t-key">delete</span>  = <span class="t-str">"d"</span>
+<span class="t-key">archive</span> = <span class="t-str">"e"</span>
+<span class="t-key">search</span>  = <span class="t-str">"/"</span>
+
+[<span class="t-key">theme</span>]
+<span class="t-key">style</span> = <span class="t-str">"dark"</span>    <span class="t-comment"># "dark" | "light" | "auto"</span></pre>
+      </div>
+
+      <h3 class="doc-h3">All options</h3>
+      <table class="config-table">
+        <thead>
+          <tr><th>Key</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>general.editor</td>
+            <td class="default">$EDITOR</td>
+            <td>Editor used for compose body. Falls back to <code class="inline">$EDITOR</code> env var.</td>
+          </tr>
+          <tr>
+            <td>general.browser</td>
+            <td class="default">xdg-open</td>
+            <td>Command used to open URLs (OAuth flow, links in emails).</td>
+          </tr>
+          <tr>
+            <td>general.page_size</td>
+            <td class="default">25</td>
+            <td>Number of emails to fetch per inbox page.</td>
+          </tr>
+          <tr>
+            <td>general.date_format</td>
+            <td class="default">relative</td>
+            <td><code class="inline">relative</code> (e.g. "2h ago") or <code class="inline">absolute</code> (e.g. "Jun 9 14:32").</td>
+          </tr>
+          <tr>
+            <td>theme.style</td>
+            <td class="default">dark</td>
+            <td><code class="inline">dark</code>, <code class="inline">light</code>, or <code class="inline">auto</code> (follows terminal background).</td>
+          </tr>
+          <tr>
+            <td>theme.glamour_style</td>
+            <td class="default">dark</td>
+            <td>Glamour markdown style for email rendering. See <a href="https://github.com/charmbracelet/glamour#styles" style="color:var(--red-light);text-decoration:none;" target="_blank" rel="noopener">glamour styles ↗</a>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Keybindings -->
+    <section class="doc-section" id="keybinds">
+      <h2 class="doc-h2">Keybindings</h2>
+      <p class="doc-p">All keybindings can be overridden in the <code class="inline">[keybinds]</code> section of your config. Keys are specified as single characters or named keys.</p>
+
+      <div class="code-block">
+        <div class="code-block-bar"><span class="code-block-lang">toml</span></div>
+        <pre>[<span class="t-key">keybinds</span>]
+<span class="t-comment"># inbox</span>
+<span class="t-key">open</span>    = <span class="t-str">"enter"</span>
+<span class="t-key">reply</span>   = <span class="t-str">"r"</span>
+<span class="t-key">compose</span> = <span class="t-str">"c"</span>
+<span class="t-key">delete</span>  = <span class="t-str">"d"</span>
+<span class="t-key">archive</span> = <span class="t-str">"e"</span>
+<span class="t-key">search</span>  = <span class="t-str">"/"</span>
+<span class="t-key">refresh</span> = <span class="t-str">"r"</span>
+<span class="t-key">label</span>   = <span class="t-str">"l"</span>
+<span class="t-key">quit</span>    = <span class="t-str">"q"</span></pre>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-label">Named keys</div>
+        <p>Supported named keys: <code class="inline">enter</code>, <code class="inline">space</code>, <code class="inline">backspace</code>, <code class="inline">tab</code>, <code class="inline">esc</code>, <code class="inline">up</code>, <code class="inline">down</code>, <code class="inline">left</code>, <code class="inline">right</code>, <code class="inline">pgup</code>, <code class="inline">pgdown</code>, <code class="inline">home</code>, <code class="inline">end</code>. Use <code class="inline">ctrl+x</code> notation for control combos.</p>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- Theming -->
+    <section class="doc-section" id="theming">
+      <h2 class="doc-h2">Theming</h2>
+      <p class="doc-p">Grail uses <a href="https://github.com/charmbracelet/lipgloss" style="color:var(--red-light);text-decoration:none;" target="_blank" rel="noopener">Lipgloss</a> for styling. The built-in themes are <code class="inline">dark</code>, <code class="inline">light</code>, and <code class="inline">auto</code>. Setting <code class="inline">auto</code> detects your terminal's background color and picks the closest theme.</p>
+      <p class="doc-p">Email bodies are rendered with Glamour. You can change the markdown style with the <code class="inline">theme.glamour_style</code> option. Available values include <code class="inline">dark</code>, <code class="inline">light</code>, <code class="inline">dracula</code>, <code class="inline">tokyo-night</code>, <code class="inline">notty</code>, and more.</p>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- CLI Reference -->
+    <section class="doc-section" id="cli-reference">
+      <h2 class="doc-h2">CLI reference</h2>
+      <table class="config-table">
+        <thead>
+          <tr><th>Command</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>grail inbox</td><td>Open the inbox TUI. Accepts <code class="inline">--label</code> flag.</td></tr>
+          <tr><td>grail compose</td><td>Open the compose view directly.</td></tr>
+          <tr><td>grail search &lt;query&gt;</td><td>Search Gmail and open results in the TUI.</td></tr>
+          <tr><td>grail auth</td><td>Run the OAuth2 authentication flow.</td></tr>
+          <tr><td>grail auth revoke</td><td>Delete the stored token.</td></tr>
+          <tr><td>grail labels list</td><td>Print all Gmail labels to stdout.</td></tr>
+          <tr><td>grail version</td><td>Print version and build info.</td></tr>
+          <tr><td>grail help [command]</td><td>Show help for a command.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="doc-h3">Global flags</h3>
+      <div class="code-block">
+        <div class="code-block-bar"><span class="code-block-lang">shell</span></div>
+        <pre><span class="t-flag">--config</span>   <span class="t-str">string</span>   <span class="t-comment">path to config file (default: ~/.config/grail/config.toml)</span>
+<span class="t-flag">--account</span>  <span class="t-str">string</span>   <span class="t-comment">Gmail account to use (for multi-account setups)</span>
+<span class="t-flag">--no-color</span>           <span class="t-comment">disable color output</span>
+<span class="t-flag">--version</span>            <span class="t-comment">print version and exit</span>
+<span class="t-flag">--help</span>               <span class="t-comment">print help and exit</span></pre>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- OAuth Setup -->
+    <section class="doc-section" id="oauth-setup">
+      <h2 class="doc-h2">OAuth setup guide</h2>
+      <p class="doc-p">Grail requires you to supply your own Google Cloud OAuth2 credentials. This is a one-time setup and takes about five minutes.</p>
+
+      <ul class="doc-ul">
+        <li>Go to <a href="https://console.cloud.google.com/" style="color:var(--red-light);text-decoration:none;" target="_blank" rel="noopener">console.cloud.google.com ↗</a> and create a new project (or use an existing one).</li>
+        <li>In the sidebar, go to <strong style="color:var(--text)">APIs &amp; Services → Library</strong> and enable the <strong style="color:var(--text)">Gmail API</strong>.</li>
+        <li>Go to <strong style="color:var(--text)">APIs &amp; Services → OAuth consent screen</strong>. Set type to <strong style="color:var(--text)">External</strong>, fill in the app name, and add your email as a test user.</li>
+        <li>Go to <strong style="color:var(--text)">APIs &amp; Services → Credentials → Create Credentials → OAuth client ID</strong>. Choose <strong style="color:var(--text)">Desktop app</strong>.</li>
+        <li>Download the JSON file and save it to <code class="inline">~/.config/grail/credentials.json</code>.</li>
+        <li>Run <code class="inline">grail auth</code>.</li>
+      </ul>
+
+      <div class="callout warn">
+        <div class="callout-label">Unverified app warning</div>
+        <p>Google will show an "unverified app" warning during the first OAuth flow. This is expected — your app is in test mode. Click <strong style="color:var(--text)">Advanced → Go to [app] (unsafe)</strong> to proceed. This warning only appears while the OAuth consent screen is in test mode.</p>
+      </div>
+    </section>
+
+    <div class="section-div"></div>
+
+    <!-- FAQ -->
+    <section class="doc-section" id="faq">
+      <h2 class="doc-h2">FAQ</h2>
+
+      <h3 class="doc-h3">I get "invalid_grant" after a while. What does that mean?</h3>
+      <p class="doc-p">The OAuth token has expired or was revoked. Run <code class="inline">grail auth</code> again to re-authenticate. This can happen if you haven't used Grail in a while or changed your Google account password.</p>
+
+      <h3 class="doc-h3">I get a 403 scope error when trying to send.</h3>
+      <p class="doc-p">Your token was issued with read-only scope. Delete <code class="inline">~/.config/grail/token.json</code> and run <code class="inline">grail auth</code> again to authorize with both <code class="inline">gmail.readonly</code> and <code class="inline">gmail.send</code> scopes.</p>
+
+      <h3 class="doc-h3">Can I use Grail with multiple Gmail accounts?</h3>
+      <p class="doc-p">Multi-account support is on the roadmap. For now, you can work around this by maintaining separate config directories and using the <code class="inline">--config</code> flag to switch between them.</p>
+
+      <h3 class="doc-h3">HTML emails look wrong.</h3>
+      <p class="doc-p">Grail converts HTML to Markdown using Glamour. Complex HTML layouts may not render perfectly — this is a known limitation of text-based rendering. Plain-text emails always render correctly.</p>
+
+      <h3 class="doc-h3">Where are my credentials and tokens stored?</h3>
+      <p class="doc-p">Everything lives in <code class="inline">~/.config/grail/</code>. Nothing is stored outside your machine.</p>
+    </section>
+
+    <!-- Prev/Next -->
+    <div class="doc-nav">
+      <a href="index.html" class="doc-nav-link">
+        <span class="doc-nav-label">← Back to</span>
+        <span>Homepage</span>
+      </a>
+      <a href="contact.html" class="doc-nav-link next">
+        <span class="doc-nav-label">Next →</span>
+        <span>Contact</span>
+      </a>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOC — position:fixed, lives outside the flex layout -->
+<nav class="toc" aria-label="On this page">
+  <div class="toc-label">On this page</div>
+  <ul class="toc-links" id="tocLinks">
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#authentication">Authentication</a></li>
+    <li><a href="#quick-start">Quick start</a></li>
+    <li><a href="#inbox">Inbox</a></li>
+    <li><a href="#reading">Reading email</a></li>
+    <li><a href="#composing">Composing</a></li>
+    <li><a href="#search">Search</a></li>
+    <li><a href="#labels">Labels</a></li>
+    <li><a href="#config-file">Config file</a></li>
+    <li><a href="#keybinds">Keybindings</a></li>
+    <li><a href="#theming">Theming</a></li>
+    <li><a href="#cli-reference">CLI reference</a></li>
+    <li><a href="#oauth-setup">OAuth setup</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+</nav>
+
+<script>
+  // Theme
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  const moonSVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  const sunSVG = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+  function setTheme(t) {
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('grail-theme', t);
+    icon.innerHTML = t === 'dark' ? sunSVG : moonSVG;
+  }
+  setTheme(localStorage.getItem('grail-theme') || 'dark');
+  toggle.addEventListener('click', () => setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+  // Sidebar toggle (mobile)
+  const sidebar = document.getElementById('sidebar');
+  document.getElementById('sidebarToggle').addEventListener('click', () => sidebar.classList.toggle('open'));
+
+  // Copy code
+  function copyCode(btn, text) {
+    navigator.clipboard.writeText(text.replace(/\\n/g, '\n')).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'copied!';
+      btn.style.color = 'var(--red-light)';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
+    });
+  }
+
+  // Active sidebar link on scroll
+  const sections = document.querySelectorAll('.doc-section[id]');
+  const sidebarLinks = document.querySelectorAll('.sidebar-links a');
+  const tocLinks = document.querySelectorAll('.toc-links a');
+
+  function updateActive() {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY + 100 >= s.offsetTop) current = s.id;
+    });
+    sidebarLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+    tocLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+</body>
+</html>
