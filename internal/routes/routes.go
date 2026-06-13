@@ -14,4 +14,5 @@ func Register(mux *http.ServeMux) {
 	mux.HandleFunc("GET /docs", docs.Handler)
 	mux.HandleFunc("GET /contact", contact.Handler)
 	mux.HandleFunc("GET /privacy", privacy.Handler)
+	mux.Handle("GET /assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 }
