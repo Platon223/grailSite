@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Privacy Policy — Grail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #120d14;
+    --bg2:       #1a1220;
+    --bg3:       #221829;
+    --surface:   #2a1e33;
+    --border:    rgba(180,60,60,0.18);
+    --border2:   rgba(180,60,60,0.35);
+    --red:       #c0392b;
+    --red-light: #e05545;
+    --red-dim:   #8b2020;
+    --red-glow:  rgba(192,57,43,0.15);
+    --text:      #ede8f0;
+    --text2:     #a89ab8;
+    --text3:     #6e5f80;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Syne', sans-serif;
+    --nav-h:     64px;
+  }
+  [data-theme="light"] {
+    --bg:        #faf7fb;
+    --bg2:       #f0eaf4;
+    --bg3:       #e8dff0;
+    --surface:   #fff;
+    --border:    rgba(140,30,30,0.14);
+    --border2:   rgba(140,30,30,0.3);
+    --red:       #c0392b;
+    --red-light: #a02020;
+    --red-dim:   #d45050;
+    --red-glow:  rgba(192,57,43,0.08);
+    --text:      #1a0f22;
+    --text2:     #5c4470;
+    --text3:     #9580aa;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ---- NAV ---- */
+  nav.topnav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    height: var(--nav-h);
+    background: rgba(18,13,20,0.88);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.3s;
+  }
+  [data-theme="light"] nav.topnav { background: rgba(250,247,251,0.88); }
+
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-text { font-family: var(--sans); font-weight: 800; font-size: 1.2rem; color: var(--text); letter-spacing: 0.04em; }
+  .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--text2);
+    text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--red-light); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .theme-toggle {
+    background: none; border: 1px solid var(--border2); border-radius: 6px;
+    width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; color: var(--text2); transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .theme-toggle:hover { border-color: var(--red); color: var(--red-light); background: var(--red-glow); }
+  .btn-nav {
+    font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--red); color: #fff; border: none; border-radius: 6px; padding: 8px 18px;
+    cursor: pointer; text-decoration: none; transition: background 0.2s;
+  }
+  .btn-nav:hover { background: var(--red-light); }
+
+  /* ---- LAYOUT ---- */
+  .page-wrap {
+    padding-top: var(--nav-h);
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0;
+    min-height: 100vh;
+  }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    position: sticky;
+    top: var(--nav-h);
+    align-self: start;
+    height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
+    padding: 3rem 1.5rem 3rem 2rem;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+    padding-left: 0.5rem;
+  }
+  .sidebar-links { list-style: none; margin-bottom: 2rem; }
+  .sidebar-links li a {
+    display: block;
+    padding: 5px 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text2);
+    text-decoration: none;
+    border-radius: 5px;
+    letter-spacing: 0.02em;
+    transition: color 0.15s, background 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .sidebar-links li a:hover { color: var(--text); background: var(--red-glow); }
+  .sidebar-links li a.active {
+    color: var(--red-light);
+    border-left-color: var(--red);
+    padding-left: calc(0.5rem - 2px);
+  }
+
+  /* ---- MAIN ---- */
+  .main {
+    padding: 4rem 4rem 7rem 4rem;
+    max-width: 740px;
+  }
+
+  /* ---- HERO HEADER ---- */
+  .page-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 0.6rem;
+  }
+  .page-title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+  .page-meta {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    margin-bottom: 2.5rem;
+  }
+
+  /* ---- TLDR CARD ---- */
+  .tldr-card {
+    background: var(--red-glow);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 3.5rem;
+  }
+  .tldr-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tldr-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .tldr-list li {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .tldr-list li::before {
+    content: '✓';
+    color: var(--red-light);
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    margin-top: 2px;
+  }
+
+  /* ---- OPEN SOURCE CARD ---- */
+  .oss-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .oss-card-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red-light);
+    margin-top: 2px;
+  }
+  .oss-card-body p {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text2);
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+  }
+  .oss-card-body p:last-child { margin-bottom: 0; }
+  .oss-card-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .oss-link {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--red-light);
+    text-decoration: none;
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 3px 10px;
+    letter-spacing: 0.04em;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .oss-link:hover { background: var(--red-glow); border-color: var(--red); }
+
+  /* ---- SECTION ---- */
+  .policy-section {
+    margin-bottom: 4rem;
+    scroll-margin-top: calc(var(--nav-h) + 1.5rem);
+  }
+  .section-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 3rem;
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--red-dim);
+    margin-bottom: 0.4rem;
+  }
+  h2.section-title {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.01em;
+  }
+  h2.section-title::before {
+    content: '#';
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--red-dim);
+    font-weight: 400;
+  }
+  .policy-p {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.95;
+    margin-bottom: 1.1rem;
+  }
+  .policy-p:last-child { margin-bottom: 0; }
+
+  .policy-ul {
+    list-style: none;
+    margin-bottom: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .policy-ul li {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 1.7;
+    padding-left: 1.25rem;
+    position: relative;
+  }
+  .policy-ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--red-dim);
+    font-size: 0.68rem;
+    top: 0.25rem;
+  }
+
+  /* ---- SCOPE TABLE ---- */
+  .scope-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+  }
+  .scope-table thead tr { border-bottom: 1px solid var(--border2); }
+  .scope-table th {
+    text-align: left;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 1rem 0.6rem 0;
+    font-weight: 400;
+  }
+  .scope-table td {
+    padding: 0.55rem 1rem 0.55rem 0;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .scope-table tr:last-child td { border-bottom: none; }
+  .scope-table td:first-child {
+    color: var(--red-light);
+    white-space: nowrap;
+  }
+
+  /* ---- CALLOUT ---- */
+  .callout {
+    border-left: 3px solid var(--red);
+    background: var(--red-glow);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--red-light);
+    margin-bottom: 0.35rem;
+  }
+  .callout p {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text2);
+    line-height: 1.75;
+    margin: 0;
+  }
+  .callout.info {
+    border-left-color: #378add;
+    background: rgba(55,138,221,0.08);
+  }
+  .callout.info .callout-label { color: #5ba4e8; }
+
+  /* ---- LIMITED USE BADGE ---- */
+  .limited-use-block {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .limited-use-block .lu-title {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lu-badge {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--red-glow);
+    border: 1px solid var(--border2);
+    color: var(--red-light);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .limited-use-block p {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text2);
+    line-height: 1.8;
+  }
+
+  /* inline code */
+  code {
+    font-family: var(--mono);
+    font-size: 0.78em;
+    background: var(--red-glow);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--red-light);
+  }
+
+  /* link */
+  a.policy-link {
+    color: var(--red-light);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border2);
+    transition: border-color 0.2s;
+  }
+  a.policy-link:hover { border-color: var(--red-light); }
+
+  /* ---- FOOTER ---- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .footer-copy { font-family: var(--mono); font-size: 0.7rem; color: var(--text3); }
+  .footer-links { display: flex; gap: 1.75rem; list-style: none; }
+  .footer-links a {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--text3);
+    text-decoration: none; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--red-light); }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 760px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 2.5rem 1.25rem 5rem; }
+    nav.topnav { padding: 0 1.25rem; }
+    .nav-links { display: none; }
+    footer { padding: 2rem 1.25rem; flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <a class="nav-logo" href="/">
+    <svg width="26" height="26" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 93,27.5 93,72.5 50,96 7,72.5 7,27.5" stroke="#c0392b" stroke-width="7" fill="none"/>
+      <text x="50" y="67" text-anchor="middle" font-family="'Syne',sans-serif" font-weight="800" font-size="48" fill="#c0392b">G</text>
+    </svg>
+    <span class="nav-logo-text">Grail</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs">Docs</a></li>
+    <li><a href="/contact">Contact</a></li>
+    <li><a href="/privacy" class="active">Privacy</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <a href="https://github.com/Platon223/Grail" class="btn-nav" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">On this page</div>
+    <ul class="sidebar-links">
+      <li><a href="#tldr" class="active">TL;DR</a></li>
+      <li><a href="#open-source">Open source</a></li>
+      <li><a href="#data-access">Data we access</a></li>
+      <li><a href="#data-storage">Where data lives</a></li>
+      <li><a href="#no-collection">What we don't do</a></li>
+      <li><a href="#third-parties">Third parties</a></li>
+      <li><a href="#website">This website</a></li>
+      <li><a href="#limited-use">Google limited use</a></li>
+      <li><a href="#license">License &amp; liability</a></li>
+      <li><a href="#revoke">Revoking access</a></li>
+      <li><a href="#changes">Changes</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-eyebrow">Privacy Policy</div>
+    <h1 class="page-title">Your email stays yours.</h1>
+    <p class="page-meta">Last updated: June 2026 &nbsp;·&nbsp; Applies to Grail the app and this website</p>
+
+    <!-- TL;DR -->
+    <div class="tldr-card" id="tldr">
+      <div class="tldr-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        TL;DR — the short version
+      </div>
+      <ul class="tldr-list">
+        <li>Grail talks directly to Gmail's API from your machine. Your email never touches our servers — because we don't have any.</li>
+        <li>Your OAuth token is stored locally on your computer only, at <code>~/.config/grail/</code>.</li>
+        <li>We do not collect, store, sell, or share your data. We can't — we have no backend.</li>
+        <li>This website has no cookies, no analytics, and no trackers of any kind.</li>
+        <li>Grail is fully open source. You can read every line of code that touches your data.</li>
+        <li>You can revoke Grail's access to your Gmail at any time from your Google account settings.</li>
+      </ul>
+    </div>
+
+    <!-- Open Source -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="open-source">
+      <div class="section-num">01</div>
+      <h2 class="section-title">Open source — verify it yourself</h2>
+      <p class="policy-p">Grail is fully open source under the MIT license. Every line of code that touches your Gmail data is publicly readable on GitHub. You don't have to take our word for any of this policy — you can audit exactly what the application does.</p>
+
+      <div class="oss-card">
+        <div class="oss-card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+        </div>
+        <div class="oss-card-body">
+          <p>The relevant parts of the codebase to review are the auth package (OAuth2 token handling) and the Gmail API client (what data is requested and how it's used). Neither sends data anywhere other than directly to Google's API.</p>
+          <div class="oss-card-links">
+            <a class="oss-link" href="https://github.com/Platon223/Grail" target="_blank" rel="noopener">Full repository ↗</a>
+            <a class="oss-link" href="https://github.com/Platon223/Grail/blob/main/internal/auth" target="_blank" rel="noopener">Auth package ↗</a>
+            <a class="oss-link" href="https://github.com/Platon223/Grail/blob/main/LICENSE" target="_blank" rel="noopener">MIT License ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Access -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="data-access">
+      <div class="section-num">02</div>
+      <h2 class="section-title">Data Grail accesses</h2>
+      <p class="policy-p">When you authenticate with Gmail, Grail requests the minimum OAuth2 scopes needed to function. These are the only permissions the application will ever request:</p>
+
+      <table class="scope-table">
+        <thead>
+          <tr>
+            <th>Scope</th>
+            <th>Why it's needed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>gmail.readonly</td>
+            <td>Read your inbox, messages, labels, and threads so they can be displayed in the TUI.</td>
+          </tr>
+          <tr>
+            <td>gmail.send</td>
+            <td>Send emails when you compose or reply. Grail cannot send email without your explicit action.</td>
+          </tr>
+          <tr>
+            <td>gmail.modify</td>
+            <td>Mark messages as read/unread, archive, trash, and apply labels. Only triggered by your keystrokes.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <div class="callout-label">Important</div>
+        <p>All API calls are made directly from your machine to Google's servers. The data returned — your email content, metadata, contacts — is displayed in your terminal and never transmitted anywhere else.</p>
+      </div>
+    </section>
+
+    <!-- Data Storage -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="data-storage">
+      <div class="section-num">03</div>
+      <h2 class="section-title">Where data lives</h2>
+      <p class="policy-p">Grail stores two files on your machine and nothing else:</p>
+      <ul class="policy-ul">
+        <li><code>~/.config/grail/credentials.json</code> — your Google Cloud OAuth2 client credentials. This is a file you download yourself from the Google Cloud Console and place here.</li>
+        <li><code>~/.config/grail/token.json</code> — the OAuth2 access and refresh token issued after you authenticate. This is what Grail uses to talk to the Gmail API on your behalf.</li>
+      </ul>
+      <p class="policy-p">Both files exist only on your local machine. Grail has no database, no cloud storage, and no remote servers. Email content is fetched from Google on demand and rendered in your terminal — it is never written to disk by Grail.</p>
+    </section>
+
+    <!-- What we don't do -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="no-collection">
+      <div class="section-num">04</div>
+      <h2 class="section-title">What we don't do</h2>
+      <p class="policy-p">To be explicit:</p>
+      <ul class="policy-ul">
+        <li>We do not collect your email content, metadata, or any other personal data.</li>
+        <li>We do not store anything on remote servers — there are none.</li>
+        <li>We do not sell, share, or transfer your data to any third party.</li>
+        <li>We do not use your data to train machine learning models.</li>
+        <li>We do not send analytics, crash reports, or telemetry of any kind.</li>
+        <li>We do not display advertising.</li>
+        <li>We do not have accounts, so there is no profile of you anywhere.</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-label">Why we can make these claims confidently</div>
+        <p>Grail is a local CLI application with no backend infrastructure. There is no mechanism by which data could be collected even if we wanted to. The source code is public — if this ever changed, it would be immediately visible.</p>
+      </div>
+    </section>
+
+    <!-- Third Parties -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="third-parties">
+      <div class="section-num">05</div>
+      <h2 class="section-title">Third parties</h2>
+      <p class="policy-p">The only third party involved when using Grail is <strong style="color:var(--text)">Google</strong>. When Grail reads or sends email, it makes API calls to Google's Gmail API. Google's handling of that data is governed by <a class="policy-link" href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy ↗</a>.</p>
+      <p class="policy-p">No other third-party services, SDKs, or analytics tools are included in Grail.</p>
+    </section>
+
+    <!-- Website -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="website">
+      <div class="section-num">06</div>
+      <h2 class="section-title">This website</h2>
+      <p class="policy-p">This website (the Grail marketing site you're reading now) does not use cookies, does not run analytics scripts, and does not load any third-party tracking code. It is a static HTML site.</p>
+      <ul class="policy-ul">
+        <li>No cookies are set.</li>
+        <li>No analytics (Google Analytics, Plausible, Fathom, etc.) are loaded.</li>
+        <li>The only external resource loaded is the Google Fonts stylesheet for typography. Google Fonts may log your IP address when the font files are requested — this is standard browser behavior for any external stylesheet.</li>
+        <li>The contact page uses a <code>mailto:</code> link that opens your local mail client. No data is submitted through this website.</li>
+      </ul>
+    </section>
+
+    <!-- Google Limited Use -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="limited-use">
+      <div class="section-num">07</div>
+      <h2 class="section-title">Google API limited use disclosure</h2>
+
+      <div class="limited-use-block">
+        <div class="lu-title">
+          Google API Services User Data Policy
+          <span class="lu-badge">Required disclosure</span>
+        </div>
+        <p>Grail's use of information received from Google APIs adheres to the <a class="policy-link" href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy ↗</a>, including the Limited Use requirements.</p>
+      </div>
+
+      <p class="policy-p">In plain terms, this means:</p>
+      <ul class="policy-ul">
+        <li>Data obtained from Google APIs is used only to provide Grail's core functionality — displaying, composing, and managing your email.</li>
+        <li>We do not use Gmail data to serve advertising.</li>
+        <li>We do not allow humans (including the developer) to read your Gmail data.</li>
+        <li>We do not use or transfer Gmail data for any purpose that is not directly stated in this policy.</li>
+        <li>We do not use Gmail data to develop, improve, or train generalized AI or ML models.</li>
+      </ul>
+    </section>
+
+    <!-- License & Liability -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="license">
+      <div class="section-num">08</div>
+      <h2 class="section-title">License &amp; liability</h2>
+      <p class="policy-p">Grail is released under the <a class="policy-link" href="https://github.com/Platon223/Grail/blob/main/LICENSE" target="_blank" rel="noopener">MIT License ↗</a>. The MIT license governs your rights to use, copy, modify, and distribute the software.</p>
+      <p class="policy-p">The software is provided <strong style="color:var(--text)">"as is"</strong>, without warranty of any kind. The author is not liable for any damages arising from its use. Because Grail operates on your Gmail account, you use it at your own risk — though given it is open source and has no backend, the attack surface is very small.</p>
+    </section>
+
+    <!-- Revoking -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="revoke">
+      <div class="section-num">09</div>
+      <h2 class="section-title">Revoking access</h2>
+      <p class="policy-p">You can remove Grail's access to your Gmail account at any time through two methods:</p>
+      <ul class="policy-ul">
+        <li><strong style="color:var(--text)">Via Google:</strong> Visit <a class="policy-link" href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions ↗</a>, find Grail, and click "Remove access". This immediately invalidates the OAuth token.</li>
+        <li><strong style="color:var(--text)">Locally:</strong> Delete <code>~/.config/grail/token.json</code>. This removes the stored token from your machine. You can also delete the entire <code>~/.config/grail/</code> directory to remove all Grail data.</li>
+      </ul>
+      <p class="policy-p">After revoking, Grail will no longer be able to access your Gmail until you run <code>grail auth</code> again.</p>
+    </section>
+
+    <!-- Changes -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="changes">
+      <div class="section-num">10</div>
+      <h2 class="section-title">Changes to this policy</h2>
+      <p class="policy-p">If this policy changes in a meaningful way — for example, if Grail ever adds a backend, telemetry, or any form of data collection — it will be clearly communicated in the GitHub changelog and the "Last updated" date above will change.</p>
+      <p class="policy-p">Because Grail is open source, any such change would also be visible in the commit history before a release ships.</p>
+    </section>
+
+    <!-- Contact -->
+    <div class="section-divider"></div>
+    <section class="policy-section" id="contact">
+      <div class="section-num">11</div>
+      <h2 class="section-title">Contact</h2>
+      <p class="policy-p">Questions about this privacy policy? Reach out at <a class="policy-link" href="mailto:platon.tikhnenko@gmail.com?subject=Privacy%20Policy%20Question">platon.tikhnenko@gmail.com</a> or open an issue on <a class="policy-link" href="https://github.com/Platon223/Grail/issues" target="_blank" rel="noopener">GitHub ↗</a>.</p>
+    </section>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-copy">© 2026 Grail. MIT License.</span>
+  <ul class="footer-links">
+    <li><a href="/docs">Docs</a></li>
+    <li><a href="/contact">Contact</a></li>
+    <li><a href="/privacy">Privacy</a></li>
+    <li><a href="https://github.com/Platon223/Grail" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+  // Theme
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  const moonSVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  const sunSVG = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+  function setTheme(t) {
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('grail-theme', t);
+    icon.innerHTML = t === 'dark' ? sunSVG : moonSVG;
+  }
+  setTheme(localStorage.getItem('grail-theme') || 'dark');
+  toggle.addEventListener('click', () => setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+  // Active sidebar on scroll
+  const sections = document.querySelectorAll('.policy-section[id], #tldr');
+  const links = document.querySelectorAll('.sidebar-links a');
+  function updateActive() {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY + 90 >= s.offsetTop) current = s.id; });
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+  }
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+</body>
+</html>
